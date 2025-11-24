@@ -20,8 +20,19 @@ async def create_short_url(
         if existing.scalar_one_or_none():
             raise ValueError("Alias already in use")
 
-    # Generate the random short code
-    short_code = generate_code()
+    # Generate a unique short code with limited retries to avoid collisions
+    max_attempts = 5
+    short_code = None
+    for _ in range(max_attempts):
+        candidate = generate_code()
+        existing_code = await db.execute(
+            select(ShortURL).where(ShortURL.short_code == candidate)
+        )
+        if not existing_code.scalar_one_or_none():
+            short_code = candidate
+            break
+    if short_code is None:
+        raise ValueError("Failed to generate a unique short code; please retry")
 
     # Calculate expiration
     expires_at = None

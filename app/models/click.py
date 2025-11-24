@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, TIMESTAMP
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, TIMESTAMP, Boolean
 from sqlalchemy.sql import func
 from app.core.database import Base
 from datetime import datetime
@@ -11,3 +11,4 @@ class Click(Base):
     user_agent = Column(String)
     ip_address = Column(String)
     timestamp = Column(TIMESTAMP, default=datetime.now)
+    is_bot = Column(Boolean, default=False)

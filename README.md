@@ -13,12 +13,12 @@ This is a FastAPI-based URL Shortener service with click analytics, rate limitin
 
 ### 0. Prerequisites
 - Python 3.10+
-- (Optional) Install `uv` for faster dependency management: see https://github.com/astral-sh/uv
+- (Optional) Install `uv` for faster dependency management:
 - Git
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Ian-Mc-Okeyo/URL-Shortener.git
 cd url-shortener
 ```
 
@@ -56,7 +56,7 @@ deactivate
 ```
 
 ### 3. Install dependencies
-If you use [uv](https://github.com/astral-sh/uv) (recommended for speed):
+If you use [uv] (recommended for speed):
 ```bash
 uv pip install
 ```
