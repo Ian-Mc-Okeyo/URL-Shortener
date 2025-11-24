@@ -17,7 +17,7 @@ async def redirect_handler(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    # Apply rate limit -> Currently for development, I have disabled to allow tests to pass since tests do multiple redirects
+    # Apply rate limit -> Currently for development, I have disabled to allow tests to pass since tests perform multiple redirects
     # client_ip = request.client.host
     # rate_limit(client_ip)
     short_url = await get_short_url(db, code)
@@ -33,7 +33,14 @@ async def redirect_handler(
     ip = request.client.host
     user_agent = request.headers.get("User-Agent")
 
-    await log_click(db, short_url, ip, user_agent)
+    # A/B testing selection
+    destination = short_url.original_url
+    if short_url.secondary_url and short_url.split_percent is not None:
+        import random
+        roll = random.randint(1, 100)
+        if roll > short_url.split_percent:  # send to secondary
+            destination = short_url.secondary_url
 
-    # Redirect to original URL
-    return RedirectResponse(short_url.original_url)
+    await log_click(db, short_url, ip, user_agent, chosen_url=destination)
+
+    return RedirectResponse(destination)

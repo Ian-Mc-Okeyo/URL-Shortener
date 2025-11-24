@@ -12,6 +12,7 @@ async def log_click(
     short_url: ShortURL,
     ip: str,
     user_agent: str | None,
+    chosen_url: str | None = None,
 ):
     bot_flag = is_bot(user_agent)
     click = Click(
@@ -19,6 +20,7 @@ async def log_click(
         ip_address=ip,
         user_agent=user_agent,
         is_bot=bot_flag,
+        chosen_url=chosen_url,
     )
     db.add(click)
     await db.commit()
@@ -66,13 +68,27 @@ async def get_analytics(code: str, db: AsyncSession):
     bot_clicks = (await db.execute(bot_count_query)).scalar() or 0
     human_clicks = total_clicks - bot_clicks
 
+    # Variant distribution if A/B enabled
+    variant_distribution = None
+    if url.secondary_url and url.split_percent is not None:
+        variant_query = (
+            select(Click.chosen_url, func.count())
+            .where(Click.short_url_id == url.id)
+            .group_by(Click.chosen_url)
+        )
+        rows = await db.execute(variant_query)
+        variant_distribution = {r[0]: r[1] for r in rows.all()}
+
     return {
         "short_code": code,
         "original_url": url.original_url,
+        "secondary_url": url.secondary_url,
+        "split_percent": url.split_percent,
         "total_clicks": total_clicks,
         "human_clicks": human_clicks,
         "bot_clicks": bot_clicks,
         "first_click": first_click,
         "last_click": last_click,
         "user_agents": user_agents,
+        "variant_distribution": variant_distribution,
     }

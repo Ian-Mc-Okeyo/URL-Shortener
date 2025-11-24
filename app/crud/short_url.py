@@ -9,7 +9,9 @@ async def create_short_url(
     db: AsyncSession,
     original_url: str,
     ttl_seconds: int | None = None,
-    custom_alias: str | None = None
+    custom_alias: str | None = None,
+    variant_url: str | None = None,
+    split_percent: int | None = None,
 ) -> ShortURL:
 
     # Check if alias is available
@@ -39,11 +41,26 @@ async def create_short_url(
     if ttl_seconds:
         expires_at = datetime.now() + timedelta(seconds=ttl_seconds)
 
+    # Handle A/B testing configuration
+    secondary_url = None
+    final_split = None
+    if variant_url:
+        secondary_url = str(variant_url)
+        # default split if not provided
+        if split_percent is None:
+            final_split = 50
+        else:
+            if not (0 <= split_percent <= 100):
+                raise ValueError("split_percent must be between 0 and 100")
+            final_split = split_percent
+
     short_url = ShortURL(
-        original_url=str(original_url),# Ensure original_url is stored as a string
+        original_url=str(original_url),  # Ensure original_url is stored as a string
         short_code=short_code,
         custom_alias=custom_alias,
-        expires_at=expires_at
+        expires_at=expires_at,
+        secondary_url=secondary_url,
+        split_percent=final_split,
     )
 
     db.add(short_url)

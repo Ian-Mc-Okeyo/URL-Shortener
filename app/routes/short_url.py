@@ -25,7 +25,9 @@ async def create_shortener(
             db=db,
             original_url=payload.original_url,
             ttl_seconds=payload.ttl_seconds,
-            custom_alias=payload.custom_alias
+            custom_alias=payload.custom_alias,
+            variant_url=payload.variant_url,
+            split_percent=payload.split_percent,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

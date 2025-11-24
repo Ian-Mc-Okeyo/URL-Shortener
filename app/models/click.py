@@ -12,3 +12,4 @@ class Click(Base):
     ip_address = Column(String)
     timestamp = Column(TIMESTAMP, default=datetime.now)
     is_bot = Column(Boolean, default=False)
+    chosen_url = Column(String, nullable=True)  # which destination was served (primary/secondary)

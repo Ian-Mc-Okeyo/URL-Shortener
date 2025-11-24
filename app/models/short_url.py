@@ -12,3 +12,5 @@ class ShortURL(Base):
     created_at = Column(TIMESTAMP, default=datetime.now)
     expires_at = Column(TIMESTAMP, nullable=True)
     custom_alias = Column(String, unique=True, nullable=True)
+    secondary_url = Column(String, nullable=True)  # for A/B testing
+    split_percent = Column(Integer, nullable=True)  # percent of traffic to primary/original_url (0-100)

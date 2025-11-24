@@ -28,6 +28,5 @@ def test_bot_filtering_counts():
     assert data["total_clicks"] == 6
     assert data["bot_clicks"] == 3
     assert data["human_clicks"] == 3
-    # Ensure user_agents contains keys (may include bots)
     assert isinstance(data["user_agents"], dict)
     assert sum(data["user_agents"].values()) == 6
